@@ -1,0 +1,848 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+
+<title>Retorno das Degustações</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Inter+Tight:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    color-scheme: light;
+    --bg: #f7f4ee;
+    --surface: #fffdf9;
+    --surface-2: #fbf6ec;
+    --ink: #241c12;
+    --ink-2: #5c5346;
+    --muted: #948a79;
+    --line: #e7dfd0;
+    --line-strong: #d8cdb8;
+    --accent: #b3690f;
+    --accent-ink: #6e3f08;
+    --accent-soft: #f3e1c4;
+    --good: #0ca30c;
+    --good-soft: #dff2df;
+    --ok: #2a78d6;
+    --warn: #d9971a;
+    --bad: #d03b3b;
+    --shadow: 0 1px 2px rgba(36,28,18,.06), 0 8px 24px -12px rgba(36,28,18,.18);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      color-scheme: dark;
+      --bg: #16130d;
+      --surface: #1e1a12;
+      --surface-2: #241f16;
+      --ink: #f5efe2;
+      --ink-2: #cdc1ac;
+      --muted: #8f846f;
+      --line: #322b1e;
+      --line-strong: #3c331f;
+      --accent: #e0a23c;
+      --accent-ink: #f6d99b;
+      --accent-soft: #3a2c14;
+      --good: #35c235;
+      --good-soft: #1c2f1a;
+      --ok: #4c93e6;
+      --warn: #e7ac3d;
+      --bad: #e66767;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 12px 32px -16px rgba(0,0,0,.6);
+    }
+  }
+  :root[data-theme="dark"]{
+    color-scheme: dark;
+    --bg: #16130d;
+    --surface: #1e1a12;
+    --surface-2: #241f16;
+    --ink: #f5efe2;
+    --ink-2: #cdc1ac;
+    --muted: #8f846f;
+    --line: #322b1e;
+    --line-strong: #3c331f;
+    --accent: #e0a23c;
+    --accent-ink: #f6d99b;
+    --accent-soft: #3a2c14;
+    --good: #35c235;
+    --good-soft: #1c2f1a;
+    --ok: #4c93e6;
+    --warn: #e7ac3d;
+    --bad: #e66767;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 12px 32px -16px rgba(0,0,0,.6);
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:"Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{ max-width:1180px; margin:0 auto; padding: 28px 20px 80px; }
+  h1,h2,h3{ font-family:"Inter Tight","Inter",system-ui,sans-serif; letter-spacing:-.01em; text-wrap:balance; margin:0; }
+  .eyebrow{ text-transform:uppercase; letter-spacing:.08em; font-size:11.5px; font-weight:700; color:var(--accent-ink); }
+
+  header.top{
+    display:flex; flex-wrap:wrap; gap:16px; align-items:flex-end; justify-content:space-between;
+    padding-bottom:20px; margin-bottom:20px; border-bottom:1px solid var(--line);
+  }
+  header.top h1{ font-size:clamp(24px,3.4vw,32px); font-weight:800; }
+  header.top p{ margin:6px 0 0; color:var(--ink-2); font-size:14.5px; max-width:60ch; }
+  .meta{ text-align:right; font-size:13px; color:var(--muted); }
+  .meta b{ color:var(--ink-2); font-weight:600; }
+
+  /* filter bar */
+  .filterbar{
+    display:flex; flex-wrap:wrap; align-items:flex-end; gap:12px;
+    background:var(--surface); border:1px solid var(--line); border-radius:14px;
+    padding:14px 16px; margin-bottom:24px; box-shadow:var(--shadow);
+  }
+  .filterbar .fgroup{ display:flex; flex-direction:column; gap:5px; min-width:132px; flex:1 1 132px; }
+  .filterbar .fgroup.wide{ flex:1 1 170px; }
+  .filterbar label{ font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); }
+  .filterbar select{
+    font:inherit; font-size:13.5px; padding:8px 10px; border-radius:9px;
+    border:1px solid var(--line-strong); background:var(--surface-2); color:var(--ink);
+    appearance:none; cursor:pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23948a79'/%3E%3C/svg%3E");
+    background-repeat:no-repeat; background-position:right 10px center; padding-right:26px;
+  }
+  .filterbar select:focus{ outline:2px solid var(--accent); outline-offset:1px; }
+  .filterbar .fdivider{ width:1px; align-self:stretch; background:var(--line); margin:0 2px; }
+  .filterbar .fbtns{ display:flex; gap:8px; align-items:center; margin-left:auto; }
+  .filterbar button.clear{
+    font:inherit; font-size:13px; font-weight:700; padding:8px 14px; border-radius:9px;
+    border:1px solid var(--line-strong); background:var(--surface-2); color:var(--ink-2); cursor:pointer;
+  }
+  .filterbar button.clear:hover{ background:var(--line); }
+  .filter-count{ font-size:12.5px; color:var(--muted); white-space:nowrap; }
+  .filter-count b{ color:var(--accent-ink); font-variant-numeric:tabular-nums; }
+
+  .empty-note{
+    background:var(--surface); border:1px dashed var(--line-strong); border-radius:14px;
+    padding:22px; text-align:center; color:var(--ink-2); font-size:14px; margin-bottom:28px;
+  }
+
+  .tiles{ display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:12px; margin-bottom:28px; }
+  .tile{
+    background:var(--surface); border:1px solid var(--line); border-radius:14px;
+    padding:16px 16px 14px; box-shadow:var(--shadow);
+  }
+  .tile .lbl{ font-size:12px; color:var(--muted); font-weight:600; }
+  .tile .val{ font-size:28px; font-weight:800; margin-top:6px; font-variant-numeric:tabular-nums; letter-spacing:-.02em; }
+  .tile .sub{ font-size:12px; color:var(--ink-2); margin-top:3px; }
+  .tile.accent{ background:linear-gradient(155deg,var(--accent-soft),var(--surface) 70%); border-color:var(--line-strong); }
+
+  section{ margin-bottom:34px; }
+  .section-head{ display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-bottom:14px; flex-wrap:wrap; }
+  .section-head h2{ font-size:19px; font-weight:800; }
+  .section-head .note{ font-size:12.5px; color:var(--muted); }
+
+  .grid-2{ display:grid; grid-template-columns:1.1fr .9fr; gap:16px; }
+  .grid-3{ display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+  @media (max-width:820px){ .grid-2,.grid-3{ grid-template-columns:1fr; } }
+
+  .card{
+    background:var(--surface); border:1px solid var(--line); border-radius:16px;
+    padding:20px 20px 16px; box-shadow:var(--shadow);
+  }
+  .card h3{ font-size:14.5px; font-weight:700; margin-bottom:2px; }
+  .card .hint{ font-size:12px; color:var(--muted); margin-bottom:14px; }
+  .card .noresult{ font-size:13px; color:var(--muted); padding:18px 0; text-align:center; }
+
+  .bar-row{ display:flex; align-items:center; gap:10px; margin:9px 0; }
+  .bar-row .lbl{ width:132px; flex:0 0 132px; font-size:12.5px; color:var(--ink-2); text-align:right; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .bar-row .track{ flex:1; background:var(--surface-2); border-radius:6px; height:16px; position:relative; overflow:hidden; }
+  .bar-row .fill{ height:100%; border-radius:6px; }
+  .bar-row .num{ width:64px; flex:0 0 64px; font-size:12.5px; font-weight:700; font-variant-numeric:tabular-nums; }
+  .bar-row.clickable{ cursor:pointer; }
+  .bar-row .chev{ width:14px; flex:0 0 14px; font-size:10px; color:var(--muted); transition:transform .15s ease; }
+  .bar-row.open .chev{ transform:rotate(90deg); }
+  .bar-detail{ margin:-3px 0 10px 142px; padding:8px 10px; background:var(--surface-2); border-radius:8px; border:1px solid var(--line); }
+  .bar-detail ul{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:5px; }
+  .bar-detail li{ font-size:12.5px; color:var(--ink-2); }
+  .bar-detail li b{ color:var(--ink); font-weight:600; }
+  .bar-detail li .where{ color:var(--muted); margin-left:4px; }
+  .theme-group h4{ font-size:12.5px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.04em; margin:0 0 10px; }
+
+  .stack{ display:flex; height:34px; border-radius:8px; overflow:hidden; border:1px solid var(--line); }
+  .stack > div{ height:100%; }
+  .legend{ display:flex; flex-wrap:wrap; gap:14px; margin-top:14px; }
+  .legend .item{ display:flex; align-items:center; gap:7px; font-size:12.5px; color:var(--ink-2); }
+  .legend .dot{ width:10px; height:10px; border-radius:3px; flex:none; }
+  .legend b{ color:var(--ink); font-variant-numeric:tabular-nums; }
+
+  svg.chart text{ font-family:"Inter",system-ui,sans-serif; fill:var(--ink-2); }
+  svg.chart .axis{ stroke:var(--line); }
+  svg.chart .muted-text{ fill:var(--muted); }
+
+  .opp-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:14px; }
+  .opp{
+    background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:16px;
+    box-shadow:var(--shadow); border-left:4px solid var(--accent);
+  }
+  .opp.opp-atencao{ border-left-color:var(--warn); }
+  .opp.opp-atencao .tag{ color:var(--warn); background:color-mix(in srgb, var(--warn) 18%, var(--surface)); }
+  .opp .tag{ display:inline-block; font-size:11px; font-weight:700; color:var(--accent-ink); background:var(--accent-soft); padding:3px 8px; border-radius:999px; margin-bottom:8px; }
+  .opp h4{ margin:0 0 6px; font-size:15px; font-weight:700; }
+  .opp p{ margin:0; font-size:13px; color:var(--ink-2); line-height:1.5; }
+  .opp .quote{ margin-top:8px; font-size:12.5px; font-style:italic; color:var(--muted); border-left:2px solid var(--line-strong); padding-left:8px; }
+
+  .prose{ background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:22px 24px; box-shadow:var(--shadow); }
+  .prose p{ font-size:14.5px; line-height:1.7; color:var(--ink-2); max-width:82ch; margin:0 0 12px; }
+  .prose p:last-child{ margin-bottom:0; }
+  .prose strong{ color:var(--ink); }
+
+  footer{ margin-top:40px; padding-top:16px; border-top:1px solid var(--line); font-size:12px; color:var(--muted); display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; }
+
+  /* PIN gate */
+  #gate{
+    position:fixed; inset:0; background:var(--bg); z-index:50;
+    display:flex; align-items:center; justify-content:center; padding:20px;
+  }
+  #gate .box{
+    background:var(--surface); border:1px solid var(--line); border-radius:18px; padding:32px 28px;
+    width:100%; max-width:340px; text-align:center; box-shadow:var(--shadow);
+  }
+  #gate .box .icon{ font-size:30px; margin-bottom:6px; }
+  #gate h2{ font-size:18px; margin-bottom:4px; }
+  #gate p{ font-size:13px; color:var(--ink-2); margin:0 0 18px; }
+  #gate input{
+    width:100%; font-size:22px; letter-spacing:.3em; text-align:center; padding:12px 10px;
+    border-radius:10px; border:1px solid var(--line-strong); background:var(--surface-2); color:var(--ink);
+    font-variant-numeric:tabular-nums;
+  }
+  #gate input:focus{ outline:2px solid var(--accent); outline-offset:1px; }
+  #gate button{
+    margin-top:14px; width:100%; padding:11px; border-radius:10px; border:none;
+    background:var(--accent); color:#fff; font-weight:700; font-size:14px; cursor:pointer;
+  }
+  #gate button:hover{ filter:brightness(1.05); }
+  #gate .err{ color:var(--bad); font-size:12.5px; margin-top:10px; min-height:16px; }
+  [hidden]{ display:none !important; }
+</style>
+
+<div id="gate">
+  <div class="box">
+    <div class="icon">🍺</div>
+    <h2>Retorno das Degustações</h2>
+    <p>Digite o PIN de acesso para ver o dashboard.</p>
+    <input id="pin-input" inputmode="numeric" maxlength="6" placeholder="••••••" autocomplete="off">
+    <button id="pin-btn">Entrar</button>
+    <div class="err" id="pin-err"></div>
+  </div>
+</div>
+
+<div class="wrap" id="content" hidden>
+
+  <header class="top">
+    <div>
+      <div class="eyebrow">Marketing · Trade marketing</div>
+      <h1>Retorno das ações de degustação</h1>
+      <p>Resumo do que promotores registraram em mercados da região metropolitana de Porto Alegre, Serra Gaúcha, litoral e Vale do Sinos.</p>
+    </div>
+    <div class="meta">
+      <div><b id="meta-total"></b> ações no filtro atual</div>
+      <div id="meta-periodo"></div>
+    </div>
+  </header>
+
+  <div class="filterbar">
+    <div class="fgroup wide">
+      <label for="f-cidade">Cidade</label>
+      <select id="f-cidade"></select>
+    </div>
+    <div class="fgroup wide">
+      <label for="f-mercado">Mercado</label>
+      <select id="f-mercado"></select>
+    </div>
+    <div class="fgroup wide">
+      <label for="f-promotora">Promotora</label>
+      <select id="f-promotora"></select>
+    </div>
+    <div class="fgroup wide">
+      <label for="f-representante">Representante</label>
+      <select id="f-representante"></select>
+    </div>
+    <div class="fdivider"></div>
+    <div class="fgroup">
+      <label for="f-ano">Ano</label>
+      <select id="f-ano"></select>
+    </div>
+    <div class="fgroup">
+      <label for="f-mes">Mês</label>
+      <select id="f-mes"></select>
+    </div>
+    <div class="fgroup">
+      <label for="f-dia">Dia</label>
+      <select id="f-dia"></select>
+    </div>
+    <div class="fbtns">
+      <span class="filter-count" id="filter-count"></span>
+      <button class="clear" id="f-clear" type="button">Limpar filtros</button>
+    </div>
+  </div>
+
+  <div id="empty-note" class="empty-note" hidden>Nenhuma ação de degustação encontrada com esses filtros. Tente limpar algum dos filtros acima.</div>
+
+  <div id="data-sections">
+
+  <section class="tiles" id="tiles"></section>
+
+  <section>
+    <div class="section-head">
+      <h2>Vendas e giro do produto</h2>
+      <div class="note">números aproximados, conforme relatado por quem fez a ação</div>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <h3>Ações de degustação por mês</h3>
+        <div class="hint">quantidade de ações registradas em cada mês, dentro do filtro atual</div>
+        <div id="months-wrap"></div>
+      </div>
+      <div class="card">
+        <h3>Aproveitamento da degustação</h3>
+        <div class="hint">produtos usados na degustação vs. produtos que sobraram</div>
+        <div id="aproveitamento-wrap"></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <h2>Recepção do público</h2>
+    </div>
+    <div class="card">
+      <h3>Como o público reagiu, nas ações do filtro atual</h3>
+      <div class="hint">classificação registrada pelo promotor em cada visita</div>
+      <div id="recepcao-wrap"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <h2>Preço de gôndola</h2>
+      <div class="note">chopp pilsen Stier 1L, conforme visto no ponto de venda</div>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <h3>Preço médio por cidade</h3>
+        <div class="hint">cidades com pelo menos 2 registros de preço, no filtro atual</div>
+        <div id="bars-preco"></div>
+      </div>
+      <div class="card">
+        <h3>Onde mais aconteceram ações</h3>
+        <div class="hint">top cidades por número de ações de degustação, no filtro atual</div>
+        <div id="bars-cidades"></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <h2>O que o cliente pede na ponta</h2>
+      <div class="note">extraído dos relatos de pedidos e comentários dos promotores, no filtro atual · clique numa barra pra ver o detalhe</div>
+    </div>
+    <div class="grid-3">
+      <div class="card theme-group">
+        <h4>Produto</h4>
+        <div id="bars-temas-produto"></div>
+      </div>
+      <div class="card theme-group">
+        <h4>Loja</h4>
+        <div id="bars-temas-loja"></div>
+      </div>
+      <div class="card theme-group">
+        <h4>Marca</h4>
+        <div id="bars-temas-marca"></div>
+      </div>
+    </div>
+  </section>
+
+  </div>
+
+  <section>
+    <div class="section-head">
+      <h2>Oportunidades de lançamento e portfólio</h2>
+      <div class="note">produto que o cliente já pede e a marca pode oferecer mais — com base no período completo</div>
+    </div>
+    <div class="opp-grid" id="opp-grid-oportunidade"></div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <h2>Pontos de atenção</h2>
+      <div class="note">coisas pra monitorar e corrigir na operação — com base no período completo</div>
+    </div>
+    <div class="opp-grid" id="opp-grid-atencao"></div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <h2>Resumo completo do retorno</h2>
+      <div class="note">com base no período completo, não muda com os filtros</div>
+    </div>
+    <div class="prose" id="resumo"></div>
+  </section>
+
+  <footer>
+    <span>Fonte: formulário de retorno das degustações (respostas dos promotores em campo)</span>
+    <span id="foot-update"></span>
+  </footer>
+</div>
+
+<script>
+// raw per-action rows, normalized from the "RETORNO - DEGUSTAÇÃO" form responses
+const ROWS = [{"date":"2026-09-05","dateValid":true,"city":"Porto Alegre","mercado":"Stok center","price":10.29,"sold":42,"used":17,"left":7,"fb":["Boa"],"th":[],"promotora":"Thyfany Liandra","representante":"Rita/Diogo"},{"date":"2026-09-05","dateValid":true,"city":"Capão da Canoa","mercado":"Asun","price":10.99,"sold":50,"used":22,"left":2,"fb":["Excelente"],"th":["Zero / sem álcool"],"promotora":"Jaqueline Débora Swarowsky De Oliveira","representante":"Rita/Diogo"},{"date":"2026-09-05","dateValid":true,"city":"Canoas","mercado":"Cerealista Canoas","price":10.59,"sold":120,"used":12,"left":12,"fb":["Excelente"],"th":[],"promotora":"Ana Rubia Garcia Da Silva","representante":"Rita/Diogo"},{"date":"2026-09-05","dateValid":true,"city":"Igrejinha","mercado":"Via atacadista","price":9.95,"sold":100,"used":24,"left":0,"fb":["Boa"],"th":["Chopp Ultra em falta / muito pedido"],"promotora":"Kauane Guarnieri","representante":"Jean"},{"date":"2026-09-05","dateValid":true,"city":"Alvorada","mercado":"Adona","price":8.99,"sold":25,"used":22,"left":2,"fb":["Excelente"],"th":["Sabor mais forte ou diferente","Preço da concorrência mais baixo"],"promotora":"Ketlyn Kressin","representante":"Gabriel"},{"date":"2026-08-29","dateValid":true,"city":"Porto Alegre","mercado":"Gauchão","price":7.99,"sold":20,"used":2,"left":28,"fb":["Boa"],"th":[],"promotora":"Juliana Silveira De Azevedo","representante":null},{"date":"2026-08-29","dateValid":true,"city":"Porto Alegre","mercado":"Gauchão","price":10.99,"sold":5,"used":6,"left":null,"fb":["Excelente"],"th":[],"promotora":"Camila Gesswein","representante":"Rita/Diogo"},{"date":"2026-08-01","dateValid":true,"city":"Igrejinha","mercado":"Via atacado","price":10.49,"sold":12,"used":23,"left":null,"fb":["Boa"],"th":[],"promotora":"Marta Regina Fritsch","representante":"Alessandro"},{"date":"2026-07-31","dateValid":true,"city":"Igrejinha","mercado":"Via atacado","price":10.49,"sold":12,"used":19,"left":5,"fb":["Boa"],"th":[],"promotora":"Marta Regina Fritsch","representante":"Alessandro"},{"date":"2026-07-30","dateValid":true,"city":"Igrejinha","mercado":"Via Atacadista","price":10.99,"sold":null,"used":13,"left":11,"fb":["Excelente"],"th":["Não conheciam a marca Stier"],"promotora":"Thais Gomes","representante":null},{"date":"2026-06-24","dateValid":true,"city":"Canoas","mercado":"Viezzer","price":8.99,"sold":30,"used":10,"left":14,"fb":["Boa"],"th":["Não conheciam a marca Stier"],"promotora":"Magda Bauer Machado","representante":"Rita/Diogo"},{"date":"2026-06-20","dateValid":true,"city":"Ivoti","mercado":"Super Kern","price":8.99,"sold":28,"used":12,"left":0,"fb":["Excelente"],"th":[],"promotora":"Gisele Canoff","representante":"Rita/Diogo"},{"date":"2026-06-13","dateValid":true,"city":"Novo Hamburgo","mercado":"Tradição Red Fort","price":9.99,"sold":13,"used":6,"left":6,"fb":["Excelente"],"th":[],"promotora":"Gisele Canoff","representante":"Silvio"},{"date":"2026-05-16","dateValid":true,"city":"Gravataí","mercado":"Vancost","price":9.99,"sold":50,"used":24,"left":2,"fb":["Excelente"],"th":["Sabor mais forte ou diferente"],"promotora":"Zeli","representante":"Gabriel"},{"date":"2026-05-15","dateValid":true,"city":"Gravataí","mercado":"Roxo","price":8.99,"sold":16,"used":14,"left":4,"fb":["Baixa"],"th":[],"promotora":"Zeli","representante":"Gabriel"},{"date":"2026-05-15","dateValid":true,"city":"Gravataí","mercado":"Roxo","price":8.99,"sold":16,"used":14,"left":4,"fb":["Baixa"],"th":[],"promotora":"Zeli","representante":"Gabriel"},{"date":"2026-05-09","dateValid":true,"city":"Gravataí","mercado":"Avanty Atacadista","price":8.99,"sold":20,"used":12,"left":12,"fb":["Excelente","Boa"],"th":[],"promotora":"Priscila Santos","representante":"Gabriel"},{"date":"2026-05-09","dateValid":true,"city":"Porto Alegre","mercado":"Baita super 9400","price":10.98,"sold":35,"used":6,"left":18,"fb":["Excelente","Boa"],"th":[],"promotora":"Beatriz Tomé","representante":null},{"date":"2026-05-09","dateValid":true,"city":"Alvorada","mercado":"Baita super","price":10.98,"sold":42,"used":8,"left":16,"fb":["Excelente","Boa"],"th":[],"promotora":"Kellen Coruja","representante":"Gabriel"},{"date":"2026-05-08","dateValid":true,"city":"Viamão","mercado":"Baita super","price":10.98,"sold":40,"used":18,"left":6,"fb":["Excelente"],"th":[],"promotora":"Beatriz Tomé","representante":"Gabriel"},{"date":"2026-05-08","dateValid":true,"city":"Viamão","mercado":"Dellazeri","price":9.69,"sold":44,"used":8,"left":19,"fb":["Excelente"],"th":[],"promotora":"Kellen Coruja Da Silveira","representante":"Gabriel"},{"date":"2026-05-08","dateValid":true,"city":"Alvorada","mercado":"Baita super","price":10.98,"sold":29,"used":9,"left":15,"fb":["Regular"],"th":["Sabor mais forte ou diferente"],"promotora":"Tailuane Fagundes Da Silva","representante":"Gabriel"},{"date":"2026-05-02","dateValid":true,"city":"Campo Bom","mercado":"Santa Lúcia","price":7.99,"sold":60,"used":14,"left":10,"fb":["Excelente"],"th":["Fruitbier sem degustação disponível"],"promotora":"Carla Andrea","representante":"Silvio"},{"date":"2026-05-02","dateValid":true,"city":"Santa Cruz do Sul","mercado":"Fort atacadista","price":null,"sold":18,"used":12,"left":5,"fb":["Boa"],"th":["Garrafa maior (2L)"],"promotora":"Daiana","representante":"Ronei"},{"date":"2026-05-02","dateValid":true,"city":"Sapucaia do Sul","mercado":"Pomier","price":9.98,"sold":30,"used":15,"left":9,"fb":["Excelente"],"th":[],"promotora":"Athyelle Oliveira","representante":null},{"date":"2026-04-30","dateValid":true,"city":"Santa Cruz do Sul","mercado":"Fort atacadista","price":null,"sold":38,"used":10,"left":2,"fb":["Excelente"],"th":[],"promotora":"Daiana","representante":"Ronei"},{"date":"2026-04-18","dateValid":true,"city":"Esteio","mercado":"Viezzer","price":9.39,"sold":60,"used":17,"left":8,"fb":["Boa"],"th":["Fruitbier sem degustação disponível"],"promotora":"Carla Andrea","representante":"Rita/Diogo"},{"date":"2026-04-18","dateValid":true,"city":"Ivoti","mercado":"Mercado Kern Ivoti","price":8.99,"sold":100,"used":19,"left":18,"fb":["Excelente"],"th":["Sem glúten","Zero / sem álcool"],"promotora":"Renata Cunha Silva","representante":"Rita/Diogo"},{"date":"2026-04-18","dateValid":true,"city":"Canoas","mercado":"VIEZZER NAZARIO","price":null,"sold":141,"used":9,"left":15,"fb":["Excelente","Boa"],"th":[],"promotora":"Bruna Moreira","representante":"Marcio"},{"date":"2026-04-18","dateValid":true,"city":"Porto Alegre","mercado":"Center Shop Protasio","price":9.98,"sold":25,"used":10,"left":14,"fb":["Boa"],"th":["Garrafa maior (2L)"],"promotora":"Paola Oliveira G Amaral","representante":"Rita/Diogo"},{"date":"2026-04-10","dateValid":true,"city":"Porto Alegre","mercado":"Atto express","price":11.99,"sold":8,"used":1,"left":null,"fb":["Excelente"],"th":[],"promotora":"Thais Gomes","representante":"Marcio"},{"date":"2026-04-04","dateValid":true,"city":"Imbé","mercado":"Stok imbé","price":8.99,"sold":65,"used":6,"left":0,"fb":["Excelente"],"th":["Não conheciam a marca Stier"],"promotora":"Nadine Boeira Witt Abdalla","representante":"Rita/Diogo"},{"date":"2026-03-27","dateValid":true,"city":"Canoas","mercado":"Unisuper canoas (Guajuviras)","price":null,"sold":10,"used":6,"left":18,"fb":["Excelente"],"th":[],"promotora":"Joice Krause","representante":"Marcio"},{"date":"2026-03-21","dateValid":true,"city":"Picada Café","mercado":"Fink Super Mercado","price":9.95,"sold":60,"used":30,"left":null,"fb":["Excelente"],"th":["Pediram mais frequência de degustação"],"promotora":"Maria Idilita","representante":"Silvio"},{"date":"2026-03-19","dateValid":true,"city":"Gravataí","mercado":"Dotta","price":7.99,"sold":20,"used":null,"left":0,"fb":["Excelente"],"th":[],"promotora":"Thais Gomes","representante":"Gabriel"},{"date":"2026-03-17","dateValid":true,"city":"Canoas","mercado":"Viezzer","price":8.99,"sold":62,"used":10,"left":14,"fb":["Excelente"],"th":["Sem glúten"],"promotora":"Tássia Nelissa Zacher Formigoni","representante":"Rita/Diogo"},{"date":"2026-03-14","dateValid":true,"city":"Gravataí","mercado":"Tottal","price":7.99,"sold":20,"used":4,"left":0,"fb":["Excelente"],"th":[],"promotora":"Thais Gomes","representante":"Gabriel"},{"date":"2026-03-14","dateValid":true,"city":"Santo Antônio da Patrulha","mercado":"Popular","price":null,"sold":null,"used":24,"left":0,"fb":["Excelente"],"th":["Produto não abastecido na gôndola"],"promotora":"Carla Abreu","representante":"Gabriel"},{"date":"2026-03-13","dateValid":true,"city":"Eldorado do Sul","mercado":"Codebal","price":null,"sold":60,"used":14,"left":10,"fb":["Boa"],"th":[],"promotora":"Carla Andrea","representante":"Rita/Diogo"},{"date":"2026-03-14","dateValid":true,"city":"Canoas","mercado":"Unisuper Canoas","price":9.98,"sold":78,"used":22,"left":2,"fb":["Excelente"],"th":[],"promotora":"Nola Almeida","representante":"Marcio"},{"date":"2026-03-14","dateValid":true,"city":"Igrejinha","mercado":"Super kraus","price":7.99,"sold":50,"used":20,"left":4,"fb":["Excelente","Boa"],"th":[],"promotora":"Marta Fritsch","representante":"Alessandro"},{"date":"2026-03-14","dateValid":true,"city":"Canoas","mercado":"Unisuper","price":9.99,"sold":83,"used":7,"left":17,"fb":["Excelente","Boa"],"th":[],"promotora":"Bruna","representante":"Marcio"},{"date":"2026-03-13","dateValid":true,"city":"Canoas","mercado":"Unisuper","price":9.98,"sold":6,"used":4,"left":8,"fb":["Boa"],"th":[],"promotora":"Thais Gomes","representante":"Marcio"},{"date":"2026-03-13","dateValid":true,"city":"Porto Alegre","mercado":"Mercado Unisuper","price":9.98,"sold":30,"used":15,"left":9,"fb":["Excelente"],"th":["Preço da concorrência mais baixo"],"promotora":"Nola Almeida","representante":"Marcio"},{"date":"2026-03-07","dateValid":true,"city":"Santa Maria do Herval","mercado":"mercado schneider","price":7.99,"sold":140,"used":30,"left":null,"fb":["Excelente"],"th":[],"promotora":"Mateus Aurelio Ebling","representante":"Silvio"},{"date":"26-04-07","dateValid":false,"city":"Viamão","mercado":"Fort atacadista","price":null,"sold":45,"used":16,"left":20,"fb":["Excelente","Boa"],"th":[],"promotora":"Rochane Patrícia Da Silva Pedroso","representante":"Ronei"},{"date":"2026-03-07","dateValid":true,"city":"Canoas","mercado":"Fort atacadista","price":null,"sold":120,"used":21,"left":3,"fb":["Excelente"],"th":["Não conheciam a marca Stier"],"promotora":"Carla Andrea De Abreu","representante":"Ronei"},{"date":"2026-03-07","dateValid":true,"city":"Gravataí","mercado":"Fort atacadista","price":10.9,"sold":150,"used":35,"left":13,"fb":["Excelente"],"th":[],"promotora":"Jéssica De Souza Lopes","representante":null},{"date":"2026-02-28","dateValid":true,"city":"Estância Velha","mercado":"Supermercado super mais","price":7.99,"sold":50,"used":16,"left":9,"fb":["Regular"],"th":["Não conheciam a marca Stier"],"promotora":"Carla Andrea","representante":"Silvio"},{"date":"2026-02-21","dateValid":true,"city":"Gravataí","mercado":"Atacarejo","price":8.99,"sold":12,"used":4,"left":null,"fb":["Boa"],"th":[],"promotora":"Priscila Quéscia Fraga De","representante":"Gabriel"},{"date":"2026-02-21","dateValid":true,"city":"Gravataí","mercado":"Mixsul","price":7.99,"sold":420,"used":24,"left":0,"fb":["Excelente"],"th":["Zero / sem álcool"],"promotora":"Thais Gomes Da Silva","representante":"Gabriel"},{"date":"2026-02-21","dateValid":true,"city":"Canoas","mercado":"Unissuper","price":10.99,"sold":27,"used":9,"left":15,"fb":["Boa","Regular"],"th":[],"promotora":"Bruna Moreira","representante":"Marcio"},{"date":"2026-02-14","dateValid":true,"city":"Cachoeirinha","mercado":"Ragan","price":9.99,"sold":27,"used":8,"left":4,"fb":["Baixa"],"th":[],"promotora":"Carla Andrea","representante":"Gabriel"},{"date":"2026-02-14","dateValid":true,"city":"Gravataí","mercado":"Mercado total","price":7.99,"sold":10,"used":23,"left":1,"fb":["Excelente"],"th":[],"promotora":"Thais Gomes","representante":"Gabriel"},{"date":"2026-02-15","dateValid":true,"city":"Viamão Águas Claras","mercado":"Oliveira matriz","price":7.99,"sold":74,"used":12,"left":6,"fb":["Excelente"],"th":[],"promotora":"Deise Tavares Da Rocha De Souza","representante":"Gabriel"},{"date":"2026-02-13","dateValid":true,"city":"Viamão Águas Claras","mercado":"Oliveira matriz","price":7.99,"sold":94,"used":10,"left":8,"fb":["Excelente"],"th":[],"promotora":"Deise Tavares Da Rocha De Souza","representante":"Gabriel"},{"date":"2026-02-14","dateValid":true,"city":"Capivari do Sul","mercado":"Mercado oliveira loja 07","price":9.49,"sold":66,"used":7,"left":null,"fb":["Excelente"],"th":[],"promotora":"Sônia Zoleida Viana Lourenço","representante":"Gabriel"},{"date":"2026-02-13","dateValid":true,"city":"Cachoeirinha","mercado":"Ragan","price":8.99,"sold":30,"used":4,"left":0,"fb":["Excelente"],"th":[],"promotora":"Thais Gomes Da Silva","representante":"Gabriel"},{"date":"2026-02-13","dateValid":true,"city":"Novo Hamburgo","mercado":"São jorje","price":7.99,"sold":64,"used":13,"left":59,"fb":["Boa"],"th":[],"promotora":"Carla Andrea","representante":"Rita/Diogo"},{"date":"2026-02-07","dateValid":true,"city":"Campo Bom","mercado":"Independenza","price":8.99,"sold":60,"used":null,"left":null,"fb":["Regular"],"th":[],"promotora":"Carla Andrea De Abreu","representante":"Silvio"},{"date":"2026-02-07","dateValid":true,"city":"Cachoeirinha","mercado":"Ragan supermercado","price":8.99,"sold":45,"used":12,"left":null,"fb":["Boa"],"th":[],"promotora":"Jéssica De Souza Lopes","representante":"Gabriel"},{"date":"2026-02-07","dateValid":true,"city":"Campo Bom","mercado":"Brito","price":9.99,"sold":49,"used":12,"left":0,"fb":["Boa"],"th":[],"promotora":"Dienifer Dias","representante":"Silvio"},{"date":"2026-02-07","dateValid":true,"city":"Rolante","mercado":"Reichert rede forte","price":7.99,"sold":15,"used":18,"left":6,"fb":["Excelente"],"th":[],"promotora":"Thais Gomes Da Silva","representante":"Alessandro"},{"date":"2026-02-06","dateValid":true,"city":"Cachoeirinha","mercado":"Ragan conveniência","price":6.99,"sold":15,"used":null,"left":0,"fb":["Excelente"],"th":[],"promotora":"Thais Gomes Da Silva","representante":"Gabriel"},{"date":"2026-01-30","dateValid":true,"city":"Porto Alegre","mercado":"Popular  Rubem Berta","price":7.99,"sold":null,"used":36,"left":0,"fb":["Excelente"],"th":[],"promotora":"Isabel Cristiane Garcia Pacheco","representante":"Gabriel"},{"date":"2026-01-31","dateValid":true,"city":"Gravataí","mercado":"Popular supermercado","price":7.99,"sold":10,"used":24,"left":12,"fb":["Boa"],"th":[],"promotora":"Thais Gomes Da Silva","representante":"Gabriel"},{"date":"2026-01-24","dateValid":true,"city":"São Leopoldo","mercado":null,"price":7.99,"sold":60,"used":18,"left":null,"fb":["Excelente"],"th":[],"promotora":"Thais Gomes Da Silva","representante":"Silvio"},{"date":"2026-01-24","dateValid":true,"city":"Porto Alegre","mercado":null,"price":6.99,"sold":150,"used":15,"left":null,"fb":["Regular"],"th":[],"promotora":"Emily Belmonte","representante":"Marcio"},{"date":"2026-01-24","dateValid":true,"city":"Porto Alegre","mercado":null,"price":6.99,"sold":150,"used":13,"left":null,"fb":["Boa"],"th":[],"promotora":"Paola Oliveira Gefter Amaral","representante":"Rita/Diogo"},{"date":"2026-01-17","dateValid":true,"city":"Balneário Pinhal","mercado":null,"price":8.49,"sold":120,"used":6,"left":null,"fb":["Excelente"],"th":["Não conheciam a marca Stier"],"promotora":"Ironi Cardoso Machado","representante":"Rita/Diogo"},{"date":"2026-01-17","dateValid":true,"city":"Noiva do Mar","mercado":null,"price":8.49,"sold":55,"used":18,"left":null,"fb":["Excelente"],"th":[],"promotora":"Eduarda Pereira Mendonça","representante":null},{"date":"2026-01-17","dateValid":true,"city":"Imbé","mercado":null,"price":8.49,"sold":120,"used":14,"left":null,"fb":["Excelente"],"th":["Chopp Ultra em falta / muito pedido"],"promotora":"Angélica Ritzel","representante":"Rita/Diogo"},{"date":"1987-12-02","dateValid":false,"city":"Capão da Canoa","mercado":null,"price":8.49,"sold":78,"used":13,"left":null,"fb":["Excelente"],"th":[],"promotora":"Janaína Kaul","representante":"Rita/Diogo"},{"date":"2026-01-10","dateValid":true,"city":"Cidreira","mercado":null,"price":8.49,"sold":134,"used":null,"left":null,"fb":["Excelente"],"th":[],"promotora":"Sônia Zoleida Viana Lourenço","representante":"Rita/Diogo"},{"date":"2026-01-09","dateValid":true,"city":"Torres","mercado":null,"price":8.49,"sold":null,"used":null,"left":null,"fb":["Excelente"],"th":["Sabor mais forte ou diferente"],"promotora":"Júlia Da Silveira De Carvalho","representante":"Rita/Diogo"},{"date":"2026-01-10","dateValid":true,"city":"Cidreira","mercado":null,"price":null,"sold":134,"used":null,"left":null,"fb":["Excelente"],"th":[],"promotora":"Sônia Zoleida Viana Lourenço","representante":"Rita/Diogo"},{"date":"2026-01-10","dateValid":true,"city":"Balneário Pinhal","mercado":null,"price":null,"sold":62,"used":null,"left":null,"fb":["Boa"],"th":[],"promotora":"Maria De Lourdes Ramos Da Silva","representante":"Rita/Diogo"},{"date":"2026-01-09","dateValid":true,"city":"Osório","mercado":null,"price":null,"sold":75,"used":null,"left":null,"fb":["Boa"],"th":[],"promotora":"Jéssica De Souza Lopes","representante":"Rita/Diogo"},{"date":"2025-12-24","dateValid":true,"city":"Gravataí","mercado":null,"price":null,"sold":90,"used":null,"left":null,"fb":["Excelente"],"th":[],"promotora":"Jéssica De Souza Lopes","representante":null},{"date":"2025-12-23","dateValid":true,"city":"Viamão","mercado":null,"price":null,"sold":null,"used":null,"left":null,"fb":["Excelente"],"th":[],"promotora":"Isabel Cristiane Garcia Pacheco","representante":null},{"date":"2025-12-20","dateValid":true,"city":"Porto Alegre","mercado":null,"price":null,"sold":null,"used":null,"left":null,"fb":["Excelente"],"th":[],"promotora":"Isabel Pacheco","representante":"Gabriel"},{"date":"2025-12-20","dateValid":true,"city":"Canela","mercado":null,"price":null,"sold":400,"used":null,"left":null,"fb":["Boa"],"th":[],"promotora":"Daiane Renck Leite","representante":null},{"date":"2025-12-20","dateValid":true,"city":"Porto Alegre","mercado":null,"price":null,"sold":60,"used":null,"left":null,"fb":["Boa"],"th":[],"promotora":"Emily Belmonte","representante":"Marcio"},{"date":"2025-12-19","dateValid":true,"city":"Montenegro","mercado":null,"price":null,"sold":40,"used":null,"left":null,"fb":["Boa"],"th":[],"promotora":"Angel Emmanuel Silva Da Luz","representante":null},{"date":"2025-12-19","dateValid":true,"city":"Porto Alegre","mercado":null,"price":null,"sold":37,"used":null,"left":null,"fb":["Boa"],"th":[],"promotora":"Patrícia Silva","representante":null},{"date":"2025-12-17","dateValid":true,"city":"Porto Alegre","mercado":null,"price":null,"sold":12,"used":null,"left":null,"fb":["Excelente"],"th":["Não conheciam a marca Stier"],"promotora":"Daniele Amador Soares","representante":null},{"date":"2025-12-17","dateValid":true,"city":"Porto Alegre","mercado":null,"price":null,"sold":12,"used":null,"left":null,"fb":["Excelente"],"th":["Não conheciam a marca Stier"],"promotora":"Daniele Amador Soares","representante":null},{"date":"2025-12-17","dateValid":true,"city":"Tramandaí","mercado":null,"price":null,"sold":21,"used":null,"left":null,"fb":["Excelente","Boa"],"th":[],"promotora":"Patrícia","representante":null},{"date":"2025-12-13","dateValid":true,"city":"Xangri-lá","mercado":null,"price":null,"sold":8,"used":null,"left":null,"fb":["Boa"],"th":[],"promotora":"Rosa Maria Dos Santos Pereira","representante":null},{"date":"2025-12-13","dateValid":true,"city":"Porto Alegre","mercado":null,"price":null,"sold":null,"used":null,"left":null,"fb":["Excelente"],"th":[],"promotora":"Isabel Cristiane Garcia Pacheco","representante":"Gabriel"},{"date":"2025-12-13","dateValid":true,"city":"Alvorada","mercado":null,"price":null,"sold":null,"used":null,"left":null,"fb":["Excelente"],"th":[],"promotora":"Vera Lúcia Garcia Pacheco","representante":null},{"date":"2025-12-12","dateValid":true,"city":"Porto Alegre","mercado":null,"price":null,"sold":24,"used":null,"left":null,"fb":["Excelente"],"th":[],"promotora":"Isabel Cristiane Garcia Pacheco","representante":"Gabriel"},{"date":"2025-12-06","dateValid":true,"city":"Novo Hamburgo","mercado":null,"price":null,"sold":40,"used":null,"left":null,"fb":["Excelente"],"th":[],"promotora":"Priscila Quéscia","representante":null},{"date":"2025-12-06","dateValid":true,"city":"Gravataí","mercado":null,"price":null,"sold":20,"used":null,"left":null,"fb":["Excelente"],"th":[],"promotora":"Thais Gomes Da Silva","representante":"Gabriel"},{"date":"2025-12-06","dateValid":true,"city":"Cachoeirinha","mercado":null,"price":null,"sold":52,"used":null,"left":null,"fb":["Excelente"],"th":[],"promotora":"Magda Bauer Machado","representante":null},{"date":"2025-12-06","dateValid":true,"city":"Nova Hartz","mercado":"mercado severo","price":null,"sold":59,"used":null,"left":null,"fb":["Boa"],"th":[],"promotora":"Dienifer Dias","representante":null},{"date":"2025-12-06","dateValid":true,"city":"Porto Alegre","mercado":"STOK MANOEL ELIAS","price":null,"sold":36,"used":null,"left":null,"fb":["Excelente"],"th":[],"promotora":"Isabel Cristiane Garcia Pacheco","representante":"Gabriel"},{"date":"2025-11-29","dateValid":true,"city":"Porto Alegre","mercado":"SUPERMERCADO CAVALLERI","price":null,"sold":36,"used":null,"left":null,"fb":["Excelente"],"th":[],"promotora":"Isabel Cristiane Garcia Pacheco","representante":"Gabriel"},{"date":"2025-11-29","dateValid":true,"city":"Harmonia","mercado":"Supermercado Ouro do Sul","price":null,"sold":112,"used":null,"left":null,"fb":["Boa"],"th":[],"promotora":"Vanessa Gabriela Müller","representante":null},{"date":"2025-11-28","dateValid":true,"city":"Igrejinha","mercado":"ATACADO MASCARELLO","price":null,"sold":174,"used":null,"left":null,"fb":["Excelente","Boa"],"th":[],"promotora":"Fabricio Von Borstel","representante":null},{"date":"2025-11-22","dateValid":true,"city":"Viamão","mercado":"SUPERMERCADO TRADIÇÃO","price":null,"sold":62,"used":null,"left":null,"fb":["Boa"],"th":[],"promotora":"Isabel","representante":null},{"date":"2025-11-22","dateValid":true,"city":"Imbé","mercado":"ASUN IMBÉ","price":null,"sold":36,"used":null,"left":null,"fb":["Excelente"],"th":[],"promotora":"Eduarda/Luci","representante":null},{"date":"2025-11-22","dateValid":true,"city":"Xangri-lá","mercado":"ASUN XANGRI-LÁ","price":null,"sold":60,"used":null,"left":null,"fb":["Excelente"],"th":[],"promotora":"Kelly","representante":null},{"date":"2025-11-21","dateValid":true,"city":"Imbé","mercado":"ASUN IMBÉ","price":null,"sold":93,"used":null,"left":null,"fb":["Excelente"],"th":[],"promotora":"Eduarda/Luci","representante":null},{"date":"2025-11-21","dateValid":true,"city":"Xangri-lá","mercado":"ASUN XANGRI-LÁ","price":null,"sold":45,"used":null,"left":null,"fb":["Excelente"],"th":[],"promotora":"Kelly","representante":null},{"date":"2025-11-19","dateValid":true,"city":"Tramandaí","mercado":"ASUN TRAMANDAÍ","price":null,"sold":27,"used":null,"left":null,"fb":["Excelente"],"th":[],"promotora":"Angélica","representante":"Rita/Diogo"},{"date":"2025-11-15","dateValid":true,"city":"Sapucaia do Sul","mercado":"Pomier loja 5","price":null,"sold":60,"used":null,"left":null,"fb":["Excelente"],"th":["Zero / sem álcool"],"promotora":"Thais Gomes","representante":null},{"date":"2026-09-11","dateValid":true,"city":"Porto Alegrete","mercado":"Asun Plinio milano","price":10.89,"sold":20,"used":4,"left":16,"fb":["Boa","Regular"],"th":[],"promotora":"Emily Belmonte","representante":"Marcio"},{"date":"2026-09-12","dateValid":true,"city":"Canoas","mercado":"Asun Igara","price":10.99,"sold":80,"used":10,"left":14,"fb":["Boa"],"th":[],"promotora":"Ana Rubia Garcia Da Silva","representante":"Rita/Diogo"},{"date":"2026-09-12","dateValid":true,"city":"Porto Alegre","mercado":"Assun","price":10.99,"sold":20,"used":15,"left":9,"fb":["Boa"],"th":[],"promotora":"Camila Gesswein","representante":"Rita/Diogo"},{"date":"2026-09-18","dateValid":true,"city":"Eldorado","mercado":"Codebal matriz","price":7.99,"sold":59,"used":14,"left":10,"fb":["Boa"],"th":[],"promotora":"Zeligeni","representante":null},{"date":"2026-09-19","dateValid":true,"city":"Canoas","mercado":"Viezzer Nazário","price":10.49,"sold":60,"used":9,"left":0,"fb":["Excelente"],"th":[],"promotora":"Ana Rubia Garcia Da Silva","representante":"Rita/Diogo"},{"date":"2026-09-20","dateValid":true,"city":"Campo Bom","mercado":"Maxfort","price":8.59,"sold":30,"used":24,"left":null,"fb":["Excelente"],"th":[],"promotora":"Marta Perotto De Moraes","representante":null}];
+
+const PIN = "260603";
+const FULL_PERIOD = {inicio: "15/11/2025", fim: "20/09/2026"};
+
+// classifica cada tema em produto, loja ou marca, e dá o nome do produto quando for o caso
+const THEME_META = {
+  'Chopp Ultra em falta / muito pedido': {tipo:'produto', produto:'Chopp Ultra'},
+  'Sem glúten': {tipo:'produto', produto:'Chopp Pilsen Sem Glúten'},
+  'Zero / sem álcool': {tipo:'produto', produto:'Lager Zero Álcool'},
+  'Fruitbier sem degustação disponível': {tipo:'produto', produto:'Fruitbier (abacaxi/bergamota)'},
+  'Sabor mais forte ou diferente': {tipo:'produto', produto:'Versão mais encorpada / sabor diferente'},
+  'Garrafa maior (2L)': {tipo:'produto', produto:'Garrafa 2L'},
+  'Produto não abastecido na gôndola': {tipo:'loja'},
+  'Preço da concorrência mais baixo': {tipo:'loja'},
+  'Não conheciam a marca Stier': {tipo:'marca'},
+  'Pediram mais frequência de degustação': {tipo:'loja'},
+};
+
+const fmtPct = n => (Math.round(n*10)/10).toString().replace('.', ',') + '%';
+const fmtBRL = n => 'R$ ' + n.toFixed(2).replace('.', ',');
+const css = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+
+const MONTH_NAMES = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+const MONTH_FULL = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+
+function gate(){
+  const box = document.getElementById('gate');
+  const input = document.getElementById('pin-input');
+  const btn = document.getElementById('pin-btn');
+  const err = document.getElementById('pin-err');
+  let unlocked = false;
+  try { unlocked = sessionStorage.getItem('stier_dash_ok') === '1'; } catch(e) {}
+  if (unlocked){ reveal(); return; }
+
+  function reveal(){
+    box.hidden = true;
+    document.getElementById('content').hidden = false;
+    init();
+  }
+  function tryUnlock(){
+    if (input.value.trim() === PIN){
+      try { sessionStorage.setItem('stier_dash_ok','1'); } catch(e) {}
+      reveal();
+    } else {
+      err.textContent = 'PIN incorreto. Tente novamente.';
+      input.value = '';
+      input.focus();
+    }
+  }
+  btn.addEventListener('click', tryUnlock);
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') tryUnlock(); });
+  setTimeout(()=>input.focus(), 50);
+}
+
+// ---------- filter state ----------
+const state = { cidade: 'all', mercado: 'all', promotora: 'all', representante: 'all', ano: 'all', mes: 'all', dia: 'all' };
+
+function uniqueSorted(arr){ return Array.from(new Set(arr)).sort((a,b)=>a.localeCompare(b,'pt-BR')); }
+
+function populateSelect(sel, options, allLabel){
+  sel.innerHTML = '';
+  const optAll = document.createElement('option');
+  optAll.value = 'all'; optAll.textContent = allLabel;
+  sel.appendChild(optAll);
+  options.forEach(([val,label])=>{
+    const o = document.createElement('option');
+    o.value = String(val); o.textContent = label;
+    sel.appendChild(o);
+  });
+}
+
+function setupFilters(){
+  const cidades = uniqueSorted(ROWS.filter(r=>r.city).map(r=>r.city));
+  const mercados = uniqueSorted(ROWS.filter(r=>r.mercado).map(r=>r.mercado));
+  const promotoras = uniqueSorted(ROWS.filter(r=>r.promotora).map(r=>r.promotora));
+  const representantes = uniqueSorted(ROWS.filter(r=>r.representante).map(r=>r.representante));
+  const anos = Array.from(new Set(ROWS.filter(r=>r.dateValid).map(r=>parseInt(r.date.slice(0,4),10)))).sort((a,b)=>a-b);
+
+  populateSelect(document.getElementById('f-cidade'), cidades.map(c=>[c,c]), 'Todas as cidades');
+  populateSelect(document.getElementById('f-mercado'), mercados.map(m=>[m,m]), 'Todos os mercados');
+  populateSelect(document.getElementById('f-promotora'), promotoras.map(r=>[r,r]), 'Todas as promotoras');
+  populateSelect(document.getElementById('f-representante'), representantes.map(r=>[r,r]), 'Todos os representantes');
+  populateSelect(document.getElementById('f-ano'), anos.map(a=>[a,a]), 'Todos os anos');
+  populateSelect(document.getElementById('f-mes'), MONTH_FULL.map((m,i)=>[i+1,m]), 'Todos os meses');
+  populateSelect(document.getElementById('f-dia'), Array.from({length:31},(_,i)=>[i+1,i+1]), 'Todos os dias');
+
+  document.getElementById('f-cidade').addEventListener('change', e=>{ state.cidade = e.target.value; render(); });
+  document.getElementById('f-mercado').addEventListener('change', e=>{ state.mercado = e.target.value; render(); });
+  document.getElementById('f-promotora').addEventListener('change', e=>{ state.promotora = e.target.value; render(); });
+  document.getElementById('f-representante').addEventListener('change', e=>{ state.representante = e.target.value; render(); });
+  document.getElementById('f-ano').addEventListener('change', e=>{ state.ano = e.target.value; render(); });
+  document.getElementById('f-mes').addEventListener('change', e=>{ state.mes = e.target.value; render(); });
+  document.getElementById('f-dia').addEventListener('change', e=>{ state.dia = e.target.value; render(); });
+  document.getElementById('f-clear').addEventListener('click', ()=>{
+    state.cidade='all'; state.mercado='all'; state.promotora='all'; state.representante='all'; state.ano='all'; state.mes='all'; state.dia='all';
+    ['f-cidade','f-mercado','f-promotora','f-representante','f-ano','f-mes','f-dia'].forEach(id=>document.getElementById(id).value='all');
+    render();
+  });
+}
+
+function dateFilterActive(){ return state.ano!=='all' || state.mes!=='all' || state.dia!=='all'; }
+
+function filteredRows(){
+  const dateActive = dateFilterActive();
+  return ROWS.filter(r=>{
+    if (state.cidade!=='all' && r.city !== state.cidade) return false;
+    if (state.mercado!=='all' && r.mercado !== state.mercado) return false;
+    if (state.promotora!=='all' && r.promotora !== state.promotora) return false;
+    if (state.representante!=='all' && r.representante !== state.representante) return false;
+    if (dateActive){
+      if (!r.dateValid) return false;
+      const [y,m,d] = r.date.split('-').map(x=>parseInt(x,10));
+      if (state.ano!=='all' && y !== parseInt(state.ano,10)) return false;
+      if (state.mes!=='all' && m !== parseInt(state.mes,10)) return false;
+      if (state.dia!=='all' && d !== parseInt(state.dia,10)) return false;
+    }
+    return true;
+  });
+}
+
+// ---------- aggregate computation over a filtered row set ----------
+function computeAggregates(rows){
+  const agg = {};
+  agg.total = rows.length;
+  agg.cidades = new Set(rows.filter(r=>r.city).map(r=>r.city)).size;
+
+  const recepcao = {Excelente:0, Boa:0, Regular:0, Baixa:0};
+  rows.forEach(r=> (r.fb||[]).forEach(c=>{ if (recepcao[c]!==undefined) recepcao[c]++; }));
+  const recepcaoTotal = Object.values(recepcao).reduce((a,b)=>a+b,0) || 1;
+  const recepcaoPct = {}; Object.keys(recepcao).forEach(k=> recepcaoPct[k] = recepcao[k]*100/recepcaoTotal );
+  agg.recepcao = recepcao; agg.recepcaoPct = recepcaoPct;
+
+  const precos = rows.map(r=>r.price).filter(v=>v!=null);
+  agg.preco = precos.length ? { medio: precos.reduce((a,b)=>a+b,0)/precos.length, min: Math.min(...precos), max: Math.max(...precos), n: precos.length } : null;
+
+  const vendidas = rows.map(r=>r.sold).filter(v=>v!=null);
+  agg.vendidas = vendidas.length ? { media: vendidas.reduce((a,b)=>a+b,0)/vendidas.length, n: vendidas.length } : null;
+
+  const usadosLeft = rows.filter(r=>r.used!=null && r.left!=null);
+  const totUsed = usadosLeft.reduce((a,r)=>a+r.used,0);
+  const totLeft = usadosLeft.reduce((a,r)=>a+r.left,0);
+  agg.aproveitamento = (totUsed+totLeft)>0 ? totUsed*100/(totUsed+totLeft) : null;
+
+  const mesesMap = {};
+  rows.filter(r=>r.dateValid).forEach(r=>{
+    const key = r.date.slice(0,7);
+    mesesMap[key] = (mesesMap[key]||0)+1;
+  });
+  agg.meses = Object.entries(mesesMap).sort((a,b)=> a[0]<b[0]?-1:1);
+
+  const cidadeCount = {};
+  rows.forEach(r=>{ if (r.city) cidadeCount[r.city] = (cidadeCount[r.city]||0)+1; });
+  agg.topCidades = Object.entries(cidadeCount).sort((a,b)=>b[1]-a[1]).slice(0,8);
+
+  const mercadoCount = {};
+  rows.forEach(r=>{ if (r.mercado) mercadoCount[r.mercado] = (mercadoCount[r.mercado]||0)+1; });
+  agg.topMercados = Object.entries(mercadoCount).sort((a,b)=>b[1]-a[1]).slice(0,8);
+
+  const cidadePrecos = {};
+  rows.forEach(r=>{ if (r.city && r.price!=null){ (cidadePrecos[r.city] = cidadePrecos[r.city]||[]).push(r.price); } });
+  agg.precoPorCidade = Object.entries(cidadePrecos)
+    .filter(([c,arr])=>arr.length>=2)
+    .map(([c,arr])=>[c, arr.reduce((a,b)=>a+b,0)/arr.length, arr.length])
+    .sort((a,b)=>b[1]-a[1]).slice(0,8);
+
+  const temaCount = {};
+  rows.forEach(r=> (r.th||[]).forEach(t=>{ temaCount[t] = (temaCount[t]||0)+1; }));
+  agg.temas = Object.entries(temaCount).sort((a,b)=>b[1]-a[1]);
+
+  // agrupa os mesmos temas por tipo (produto / loja / marca), com o detalhe de cada ocorrência
+  const temaGrupos = { produto: {}, loja: {}, marca: {} };
+  rows.forEach(r=>{
+    (r.th||[]).forEach(t=>{
+      const meta = THEME_META[t];
+      if (!meta) return;
+      const bucket = temaGrupos[meta.tipo];
+      if (!bucket[t]) bucket[t] = [];
+      bucket[t].push({
+        cidade: r.city || 'Não informado',
+        loja: r.mercado || 'Não informado',
+        produto: meta.produto,
+      });
+    });
+  });
+  agg.temasByTipo = {};
+  Object.keys(temaGrupos).forEach(tipo=>{
+    agg.temasByTipo[tipo] = Object.entries(temaGrupos[tipo])
+      .map(([nome, itens]) => [nome, itens.length, itens])
+      .sort((a,b)=>b[1]-a[1]);
+  });
+
+  return agg;
+}
+
+function tile(lbl, val, sub, accent){
+  const d = document.createElement('div');
+  d.className = 'tile' + (accent ? ' accent' : '');
+  d.innerHTML = `<div class="lbl">${lbl}</div><div class="val">${val}</div><div class="sub">${sub||''}</div>`;
+  return d;
+}
+
+function renderTiles(agg){
+  const wrap = document.getElementById('tiles');
+  wrap.innerHTML = '';
+  const posPct = agg.recepcaoPct.Excelente + agg.recepcaoPct.Boa;
+  wrap.appendChild(tile('Ações no filtro', agg.total, dateFilterActive() || state.cidade!=='all' || state.mercado!=='all' || state.promotora!=='all' || state.representante!=='all' ? 'de ' + ROWS.length + ' no total' : FULL_PERIOD.inicio + ' – ' + FULL_PERIOD.fim, true));
+  wrap.appendChild(tile('Cidades atendidas', agg.cidades, 'no filtro atual'));
+  wrap.appendChild(tile('Recepção positiva', agg.total ? fmtPct(posPct) : '—', 'somando Excelente + Boa'));
+  wrap.appendChild(tile('Preço médio de gôndola', agg.preco ? fmtBRL(agg.preco.medio) : '—', agg.preco ? fmtBRL(agg.preco.min)+' a '+fmtBRL(agg.preco.max) : 'sem registros de preço'));
+  wrap.appendChild(tile('Aproveitamento da degustação', agg.aproveitamento!=null ? fmtPct(agg.aproveitamento) : '—', 'produto usado vs. sobra'));
+}
+
+function renderMonths(agg){
+  const wrap = document.getElementById('months-wrap');
+  const entries = agg.meses;
+  if (!entries.length){ wrap.innerHTML = '<div class="noresult">Sem ações com data válida nesse filtro.</div>'; return; }
+  const W = 560, H = 220, padL = 34, padR = 14, padT = 14, padB = 30;
+  const innerW = W - padL - padR, innerH = H - padT - padB;
+  const max = Math.max(...entries.map(e=>e[1]));
+  const x = i => entries.length>1 ? padL + (innerW * i / (entries.length-1)) : padL + innerW/2;
+  const y = v => padT + innerH - (innerH * v / (max*1.15));
+  const monthLbl = k => { const [y,m] = k.split('-'); return MONTH_NAMES[parseInt(m,10)-1] + '/' + y.slice(2); };
+  const accent = css('--accent') || '#b3690f';
+  const inkText = css('--ink-2') || '#5c5346';
+  const surface = css('--surface') || '#fff';
+
+  let gridLines = '';
+  for(let i=0;i<=3;i++){
+    const gy = padT + innerH*i/3;
+    gridLines += `<line x1="${padL}" y1="${gy}" x2="${W-padR}" y2="${gy}" class="axis" stroke-width="1" />`;
+  }
+
+  let pathD = '';
+  entries.forEach(([k,v],i)=>{ const px = x(i), py = y(v); pathD += (i===0?'M':'L') + px.toFixed(1) + ' ' + py.toFixed(1) + ' '; });
+  const areaD = pathD + `L${x(entries.length-1).toFixed(1)} ${padT+innerH} L${x(0).toFixed(1)} ${padT+innerH} Z`;
+
+  let dots = '', labels='';
+  entries.forEach(([k,v],i)=>{
+    const px = x(i), py = y(v);
+    dots += `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="4" fill="${accent}" stroke="${surface}" stroke-width="1.5"/>`;
+    if (i % Math.max(1,Math.ceil(entries.length/7)) === 0 || i===entries.length-1){
+      labels += `<text x="${px.toFixed(1)}" y="${H-8}" font-size="10.5" text-anchor="middle" class="muted-text">${monthLbl(k)}</text>`;
+    }
+    labels += `<text x="${px.toFixed(1)}" y="${(py-9).toFixed(1)}" font-size="10.5" text-anchor="middle" font-weight="700" fill="${inkText}">${v}</text>`;
+  });
+
+  wrap.innerHTML = `<svg class="chart" viewBox="0 0 ${W} ${H}" width="100%">
+    ${gridLines}
+    <path d="${areaD}" fill="${accent}" opacity="0.12" stroke="none"/>
+    <path d="${pathD}" fill="none" stroke="${accent}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+    ${dots}${labels}
+  </svg>`;
+}
+
+function renderAproveitamento(agg){
+  const wrap = document.getElementById('aproveitamento-wrap');
+  if (agg.aproveitamento==null){ wrap.innerHTML = '<div class="noresult">Sem registros de uso/sobra nesse filtro.</div>'; return; }
+  const pct = agg.aproveitamento;
+  const size = 168, stroke = 18, r = (size-stroke)/2, c = 2*Math.PI*r;
+  const dash = c * pct/100;
+  const track = css('--surface-2') || '#eee';
+  const good = css('--good') || '#0ca30c';
+  const vendidasTxt = agg.vendidas ? `<b>${agg.vendidas.n}</b> ações registraram alguma venda direta no mercado, com média aproximada de <b>${Math.round(agg.vendidas.media*10)/10}</b> unidades por ação.` : 'não há registros de venda direta suficientes nesse filtro.';
+  wrap.innerHTML = `
+    <div style="display:flex;align-items:center;gap:22px;flex-wrap:wrap;">
+      <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+        <circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="${track}" stroke-width="${stroke}"/>
+        <circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="${good}" stroke-width="${stroke}"
+          stroke-dasharray="${dash.toFixed(1)} ${c.toFixed(1)}" stroke-linecap="round"
+          transform="rotate(-90 ${size/2} ${size/2})"/>
+        <text x="${size/2}" y="${size/2-2}" text-anchor="middle" font-size="26" font-weight="800" fill="var(--ink)">${fmtPct(pct)}</text>
+        <text x="${size/2}" y="${size/2+18}" text-anchor="middle" font-size="11" fill="var(--muted)">usado na ação</text>
+      </svg>
+      <div style="flex:1;min-width:160px;font-size:13px;color:var(--ink-2);line-height:1.6;">
+        Em média, de tudo que os promotores levaram para degustar, cerca de <b>${fmtPct(pct)}</b> foi realmente consumido na ação — o resto voltou como sobra.
+        Isso é diferente das vendas de prateleira: ${vendidasTxt}
+      </div>
+    </div>
+  `;
+}
+
+const RECEPCAO_COLOR = {
+  Excelente: () => css('--good') || '#0ca30c',
+  Boa: () => css('--ok') || '#2a78d6',
+  Regular: () => css('--warn') || '#d9971a',
+  Baixa: () => css('--bad') || '#d03b3b',
+};
+
+function renderRecepcao(agg){
+  const wrap = document.getElementById('recepcao-wrap');
+  if (!agg.total){ wrap.innerHTML = '<div class="noresult">Sem ações nesse filtro.</div>'; return; }
+  const order = ['Excelente','Boa','Regular','Baixa'];
+  const stackHtml = order.map(k => {
+    const pct = agg.recepcaoPct[k];
+    return `<div style="width:${pct}%;background:${RECEPCAO_COLOR[k]()}" title="${k}: ${fmtPct(pct)}"></div>`;
+  }).join('');
+  const legendHtml = order.map(k => `
+    <div class="item"><span class="dot" style="background:${RECEPCAO_COLOR[k]()}"></span>${k} <b>${fmtPct(agg.recepcaoPct[k])}</b> (${agg.recepcao[k]})</div>
+  `).join('');
+  wrap.innerHTML = `<div class="stack">${stackHtml}</div><div class="legend">${legendHtml}</div>`;
+}
+
+function barList(container, items, {max, color, fmt}){
+  if (!items.length){ container.innerHTML = '<div class="noresult">Sem dados suficientes nesse filtro.</div>'; return; }
+  container.innerHTML = items.map(([label, v]) => {
+    const pct = Math.max(4, 100*v/max);
+    return `<div class="bar-row">
+      <div class="lbl" title="${label}">${label}</div>
+      <div class="track"><div class="fill" style="width:${pct}%;background:${color}"></div></div>
+      <div class="num">${fmt(v)}</div>
+    </div>`;
+  }).join('');
+}
+
+function detailLine(tipo, item){
+  if (tipo === 'produto'){
+    return `<li><b>${item.produto}</b><span class="where">· ${item.loja}, ${item.cidade}</span></li>`;
+  }
+  return `<li><b>${item.loja}</b><span class="where">· ${item.cidade}</span></li>`;
+}
+
+function renderTemaGroup(containerId, entries, tipo, color){
+  const container = document.getElementById(containerId);
+  if (!entries.length){ container.innerHTML = '<div class="noresult">Nenhum registro nesse filtro.</div>'; return; }
+  const max = Math.max(...entries.map(([,n])=>n));
+  container.innerHTML = entries.map(([nome, n, itens], idx) => {
+    const pct = Math.max(6, 100*n/max);
+    const rowId = `tema-${tipo}-${idx}`;
+    return `
+      <div class="bar-row clickable" data-target="${rowId}">
+        <div class="lbl" style="width:132px;flex:0 0 132px;text-align:right;" title="${nome}">${nome}</div>
+        <div class="track"><div class="fill" style="width:${pct}%;background:${color}"></div></div>
+        <div class="num">${n}x</div>
+        <div class="chev">▶</div>
+      </div>
+      <div class="bar-detail" id="${rowId}" hidden><ul>${itens.map(it=>detailLine(tipo, it)).join('')}</ul></div>
+    `;
+  }).join('');
+  container.querySelectorAll('.bar-row.clickable').forEach(row=>{
+    row.addEventListener('click', () => {
+      const detail = document.getElementById(row.getAttribute('data-target'));
+      const willOpen = detail.hidden;
+      detail.hidden = !willOpen;
+      row.classList.toggle('open', willOpen);
+    });
+  });
+}
+
+function renderBarCharts(agg){
+  const accent = css('--accent') || '#b3690f';
+  const ok = css('--ok') || '#2a78d6';
+
+  const precoItems = agg.precoPorCidade.map(([c,avg])=>[c,avg]);
+  barList(document.getElementById('bars-preco'), precoItems, {
+    max: precoItems.length ? Math.max(...precoItems.map(i=>i[1]))*1.05 : 1, color: accent, fmt: v => fmtBRL(v)
+  });
+
+  barList(document.getElementById('bars-cidades'), agg.topCidades, {
+    max: agg.topCidades.length ? Math.max(...agg.topCidades.map(i=>i[1])) : 1, color: ok, fmt: v => v + (v===1?' ação':' ações')
+  });
+
+  const warn = css('--warn') || '#d9971a';
+  renderTemaGroup('bars-temas-produto', agg.temasByTipo.produto, 'produto', accent);
+  renderTemaGroup('bars-temas-loja', agg.temasByTipo.loja, 'loja', ok);
+  renderTemaGroup('bars-temas-marca', agg.temasByTipo.marca, 'marca', warn);
+}
+
+const OPPORTUNITIES = [
+  {kind:'atencao', tag:'Estoque', title:'Chopp Ultra vendendo mais rápido que o tradicional', text:'Em ações onde o Ultra estava com preço mais atrativo, ele superou a venda do pilsen tradicional — mas em vários pontos ele acaba em falta justamente durante a degustação.', quote:'“Pilsen ultra que estava em degustação, mas não tinha para venda.” — Igrejinha'},
+  {kind:'atencao', tag:'Planejamento', title:'Fruitbier ficou de fora da degustação em alguns pontos', text:'Isso não é oportunidade de lançamento, é falha de planejamento do representante, que não pediu os produtos certos pra ação. O fruitbier já está no portfólio, então o ponto aqui é garantir que ele realmente vá pra degustação quando for programado.', quote:'“Teve muita curiosidade em experimentar os fruitbier, mas não teve pra degustação, com certeza teria vendido bem.” — Campo Bom'},
+  {kind:'oportunidade', tag:'Portfólio', title:'Pedido recorrente por sem glúten e zero álcool', text:'Já existem as versões pilsen sem glúten e a lager sem álcool no portfólio — o pedido nas ações mostra que vale reforçar a presença desses itens nos pontos de degustação.', quote:'“Pessoal está pedindo chopp sem glúten.” — Canoas'},
+  {kind:'atencao', tag:'Awareness', title:'Muita gente ainda não conhece a marca Stier', text:'É o comentário mais repetido entre os promotores: a degustação costuma ser o primeiro contato do consumidor com a marca, o que reforça a importância de mídia e presença de marca no ponto de venda.', quote:'“A maioria dos clientes não conhecia o chopp Stier, os que degustaram aprovaram e muitos levaram.” — Estância Velha'},
+  {kind:'atencao', tag:'Trade', title:'Reposição de gôndola custa vendas', text:'Em pelo menos 4 relatos, o produto não estava abastecido na gôndola durante a ação, limitando as vendas mesmo com boa aceitação na degustação.', quote:'“O produto não estava abastecido na gôndola... o retorno em vendas acabou sendo limitado.” — Santo Antônio da Patrulha'},
+  {kind:'atencao', tag:'Preço', title:'Sensibilidade a preço frente à concorrência local', text:'Em alguns mercados a concorrência aparece com preço mais baixo, o que os promotores apontam como freio na conversão mesmo com boa receptividade.', quote:'“Chopp da concorrência 4 reais mais barato.” — Xangri-lá'},
+];
+
+function renderOpportunities(){
+  const cardHtml = o => `
+    <div class="opp${o.kind==='atencao' ? ' opp-atencao' : ''}">
+      <span class="tag">${o.tag}</span>
+      <h4>${o.title}</h4>
+      <p>${o.text}</p>
+      <div class="quote">${o.quote}</div>
+    </div>
+  `;
+  document.getElementById('opp-grid-oportunidade').innerHTML = OPPORTUNITIES.filter(o=>o.kind==='oportunidade').map(cardHtml).join('');
+  document.getElementById('opp-grid-atencao').innerHTML = OPPORTUNITIES.filter(o=>o.kind==='atencao').map(cardHtml).join('');
+}
+
+function renderResumo(){
+  const el = document.getElementById('resumo');
+  el.innerHTML = `
+    <p>Entre <strong>${FULL_PERIOD.inicio}</strong> e <strong>${FULL_PERIOD.fim}</strong> foram registradas <strong>113 ações de degustação</strong> em <strong>37 cidades</strong>, principalmente na região metropolitana de Porto Alegre. A recepção do público é o ponto mais forte: <strong>92,8%</strong> das ações foram classificadas como Excelente ou Boa, com poucos relatos de baixo interesse.</p>
+    <p>O preço médio encontrado na gôndola ficou em torno de <strong>R$ 9,28</strong>, variando de R$ 6,99 a R$ 11,99 conforme a cidade e o canal. Nos relatos, o Chopp Ultra aparece como o sabor que mais rápido sai quando o preço fica mais competitivo que o pilsen tradicional, e é também o que mais gera reclamação de falta de estoque durante a degustação.</p>
+    <p>O pedido mais recorrente entre os clientes não é por um produto totalmente novo, é por mais disponibilidade do que a marca já tem: sem glúten e zero álcool aparecem repetidamente como itens que o público quer provar e às vezes não encontra no ponto. Já o fruitbier é um caso à parte: o interesse do público existe, mas em mais de um relato o produto simplesmente não foi levado pra ação, o que aponta pra uma falha de planejamento na hora de montar o kit de degustação, não pra uma lacuna de portfólio. Some a isso um tema que se repete o tempo todo nos comentários dos promotores, muita gente ainda não conhecia a marca Stier antes da degustação, e fica claro que a ação funciona muito bem como porta de entrada da marca, mas o resultado em vendas depende de reposição de gôndola e de preço competitivo frente à concorrência local.</p>
+    <p>Em resumo: a aceitação do produto não é o problema, a disponibilidade é. Garantir estoque do Ultra, garantir que o fruitbier realmente vá pra degustação quando for programado, reforçar a presença do sem glúten e do zero álcool, e cuidar da reposição de gôndola durante a ação são as alavancas mais diretas pra transformar essa recepção positiva em mais vendas.</p>
+  `;
+}
+
+function updateMeta(agg, rows){
+  document.getElementById('meta-total').textContent = agg.total;
+  const active = dateFilterActive() || state.cidade!=='all' || state.mercado!=='all' || state.promotora!=='all' || state.representante!=='all';
+  if (!active){
+    document.getElementById('meta-periodo').textContent = FULL_PERIOD.inicio + ' – ' + FULL_PERIOD.fim;
+  } else {
+    const validDates = rows.filter(r=>r.dateValid).map(r=>r.date).sort();
+    if (validDates.length){
+      const toBR = iso => { const [y,m,d] = iso.split('-'); return `${d}/${m}/${y}`; };
+      document.getElementById('meta-periodo').textContent = toBR(validDates[0]) + ' – ' + toBR(validDates[validDates.length-1]);
+    } else {
+      document.getElementById('meta-periodo').textContent = 'sem datas no filtro';
+    }
+  }
+  const countEl = document.getElementById('filter-count');
+  countEl.innerHTML = active ? `<b>${agg.total}</b> de ${ROWS.length} ações` : `${ROWS.length} ações no total`;
+}
+
+function render(){
+  const rows = filteredRows();
+  const agg = computeAggregates(rows);
+  updateMeta(agg, rows);
+
+  const emptyNote = document.getElementById('empty-note');
+  const dataSections = document.getElementById('data-sections');
+  if (!rows.length){
+    emptyNote.hidden = false; dataSections.hidden = true; return;
+  }
+  emptyNote.hidden = true; dataSections.hidden = false;
+
+  renderTiles(agg);
+  renderMonths(agg);
+  renderAproveitamento(agg);
+  renderRecepcao(agg);
+  renderBarCharts(agg);
+}
+
+function init(){
+  document.getElementById('foot-update').textContent = 'Atualizado toda segunda-feira · dados de ' + FULL_PERIOD.fim;
+  setupFilters();
+  renderOpportunities();
+  renderResumo();
+  render();
+}
+
+gate();
+</script>
+
+
+</body>
+</html>
